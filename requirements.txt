@@ -1,0 +1,24 @@
+# ---- 运行依赖 ----
+# 工作流编排
+langgraph>=0.2.0,<0.3.0
+
+# LLM 客户端（百炼 / 通义千问，OpenAI 兼容）
+openai>=1.30.0
+
+# 网页抓取（主力；未安装时 crawl4ai_client 会自动降级为 requests）
+crawl4ai>=0.8.0
+
+# HTTP 探测 / ICP API 调用
+requests>=2.31.0
+
+# 域名解析（registrable domain 提取，历史先验匹配）
+tldextract>=5.0
+
+# 配置加载（scene_config.yaml / path_candidates.yaml）
+pyyaml>=6.0
+
+# 环境变量（.env 加载 DASHSCOPE_API_KEY）
+python-dotenv>=1.0
+
+# ---- 开发依赖（可选）----
+pytest>=8.0.0

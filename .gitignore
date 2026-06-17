@@ -1,0 +1,37 @@
+# ---- Secrets / 环境 ----
+.env
+.env.local
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.db
+
+# ---- 项目运行产物 ----
+results.jsonl
+tmp_results.jsonl
+data/crawl_artifacts/
+_test_encoding.txt
+
+# ---- 数据资产 / 二进制（按需决定是否纳入版本管理）----
+# icp_query/icpApi.exe 是 ICP 查询服务的运行时组件（~23MB），团队需要它跑 ICP 兜底分支，
+# 故纳入版本管理；如担心仓库膨胀，可改用 Git LFS。
+icp_query/logs/
+icp_query/faile_captcha/
+*.xlsx
+*.csv
+~$*.xlsx
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+~$*

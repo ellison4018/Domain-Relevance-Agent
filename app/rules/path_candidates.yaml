@@ -1,0 +1,25 @@
+# Candidate paths to probe when the apex returns a cloud/WAF error page.
+# Probed in order; the first path that yields a usable page becomes the
+# selected_url for downstream crawling.
+candidates:
+  - /
+  - /home
+  - /index.html
+  - /about
+  - /index
+  - /company
+  - /contact
+  - /user/login
+  - /products
+  - /services
+  - /web
+  - /h5
+  - /m
+  - /app
+  - /help
+  - /support
+  - /docs
+  - /documentation
+  - /login
+  - /course
+  - /courses

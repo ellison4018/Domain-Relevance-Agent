@@ -1,0 +1,437 @@
+version: 0.1
+primary_scene: 成人教育课程
+description: >
+  面向成年人，尤其是中老年人、退休/半退休人群、自由职业者、副业探索人群的线上课程、训练营、社群转化或知识付费场景。
+
+# 二级类别（LLM 相关性判断与历史库对齐的权威标签）。投顾等强监管金融方向
+# 单列「金融保险类」便于合规标记；历史库当前只有 兴趣类/副业类，后续补齐。
+categories:
+  - 兴趣类
+  - 副业类
+  - 金融保险类
+
+# 纯 verdict 驱动的评分常量。LLM 不再输出数值分数；score.py 据此把分类结论
+# 与结构化信号映射为最终分数。所有数字集中在此，便于统一调参。
+scoring:
+  base_match: 60
+  base_uncertain: 30
+  base_no_match: 0
+  signal_weight: 5           # 每个信号 strength 的加减分权重
+  signal_min: -20             # signal_bonus 下限
+  signal_max: 25              # signal_bonus 上限
+  category_bonus: 8           # LLM 给出非 null category
+  consistency_bonus: 10       # LLM category == 历史先验 matched_category
+  prior_bonus_max: 15         # 历史先验封顶
+  match_threshold: 70         # match 判定通过线
+  quality_low_threshold: 40   # 内容质量低于此值触发人工复核
+
+global_positive_signals:
+  - 课程
+  - 训练营
+  - 直播课
+  - 录播课
+  - 公开课
+  - 报名
+  - 学员
+  - 老师
+  - 导师
+  - 社群
+  - 零基础
+  - 小白
+  - 体验课
+  - 付费课
+  - 变现
+  - 副业
+  - 私域
+  - 领取资料
+  - 添加老师
+  - 扫码进群
+
+global_negative_signals:
+  - 纯工具官网
+  - 纯软件下载站
+  - 纯资讯门户
+  - 百科词条
+  - 论坛社区
+  - 云服务默认页
+  - CDN资源域名
+  - 统计分析域名
+  - 支付域名
+  - 登录页但无业务信息
+  - 政府/高校继续教育官网但无商业课程转化
+
+generic_tool_policy:
+  default_penalty: 35
+  note: 通用平台、云厂商、统计、CDN、支付、社区类域名默认降权，除非页面内容强烈证明其承载具体课程业务。
+  signals:
+    - aliyun
+    - aliyuncs
+    - tencentcloud
+    - qcloud
+    - baidu.com
+    - cloudflare
+    - cloudfront
+    - cdn
+    - cname
+    - stats
+    - analytics
+    - tracking
+    - paypal
+    - stripe
+    - alipay
+    - wepay
+    - weixin.qq.com
+    - github.io
+    - github.com
+    - shopify
+    - myshopify.com
+    - wordpress.com
+    - wixsite.com
+    - wix.com
+    - squarespace
+    - webflow.io
+    - notion.site
+    - 免费建站
+    - 自助建站
+    - SaaS
+    - 模板建站
+    - 有赞
+    - 微盟
+
+scenes:
+  - id: investment_advisory
+    name: 投顾
+    category: 金融保险类
+    audience_profile:
+      age: 40岁以上，尤其50岁以上
+      gender: 男性为主
+      family: 已婚已育，家庭财务责任强
+      device: 安卓为主，华为、荣耀占比突出
+      behavior: 对财经资讯、投资机会、资产配置敏感
+    strong_positive_signals:
+      - 投顾
+      - 股票课程
+      - 炒股
+      - 证券投资
+      - 财富管理
+      - 理财课
+      - 财商课
+      - 资产配置
+      - 牛股
+      - 选股
+      - 诊股
+      - 投资训练营
+      - 财经直播课
+      - 老师带学
+      - 投研
+    weak_positive_signals:
+      - 财经
+      - 理财
+      - 基金
+      - A股
+      - 港股
+      - 指数
+      - 养老金
+      - 退休理财
+    negative_signals:
+      - 纯财经新闻
+      - 证券公司官网
+      - 银行官网
+      - 基金公司官网
+      - 股票行情工具
+      - 无课程/报名/社群转化信息
+    compliance_notes:
+      - 投顾属于高敏感/强监管方向，需保留证据链。
+      - 不能仅因页面出现财经资讯就判为课程相关。
+      - 出现荐股、带单、收益承诺等信号时应标记合规风险。
+
+  - id: video_editing
+    name: 剪辑课程
+    category: 副业类
+    audience_profile:
+      age: 50-70岁，主力55-65岁
+      gender: 女性略多
+      city: 三线及以下城市较多，其次二线
+      income: 中低收入，希望增加收入
+      occupation: 自由职业、退休、半退休，有空闲时间
+    strong_positive_signals:
+      - 视频剪辑
+      - 剪映
+      - 短视频剪辑
+      - 影视后期
+      - Pr
+      - Premiere
+      - AE
+      - CapCut
+      - 短视频变现
+      - 剪辑训练营
+      - 剪辑课
+      - 接单
+      - 账号运营
+    weak_positive_signals:
+      - 短视频
+      - 新媒体
+      - 涨粉
+      - 副业
+      - 变现
+      - 小白入门
+    negative_signals:
+      - 纯剪辑工具官网
+      - 素材资源站
+      - 视频平台
+      - 软件下载站
+      - 纯教程文章且无课程转化
+
+  - id: ai_graphic
+    name: AI图文课程
+    category: 副业类
+    audience_profile:
+      age: 50-70岁，主力55-65岁
+      gender: 女性略多
+      city: 下沉市场和二线城市
+      income: 中低收入，希望通过线上副业增加收入
+      occupation: 自由职业、退休、半退休
+    strong_positive_signals:
+      - AI图文
+      - AI绘画
+      - AI写作
+      - AI副业
+      - 图文带货
+      - AI变现
+      - 小红书图文
+      - 公众号图文
+      - AI训练营
+      - AIGC课程
+      - Midjourney
+      - Stable Diffusion
+      - ChatGPT课程
+    weak_positive_signals:
+      - 自媒体
+      - 图文创作
+      - 文案
+      - 变现
+      - 副业
+      - 零基础
+    negative_signals:
+      - 纯AI工具站
+      - 纯模型官网
+      - 提示词资源站
+      - 纯素材站
+      - 无课程/报名/社群转化
+
+  - id: cross_border
+    name: 跨境课程
+    category: 副业类
+    audience_profile:
+      age: 50-70岁
+      gender: 女性略多
+      city: 三线及以下城市较多
+      income: 中低收入，希望增加收入
+      occupation: 自由职业、退休、半退休
+    strong_positive_signals:
+      - 跨境电商
+      - 亚马逊开店
+      - TikTok Shop
+      - Shopee
+      - Temu
+      - 独立站
+      - 外贸
+      - 跨境训练营
+      - 选品
+      - 店铺运营
+      - 跨境副业
+      - 出海电商
+    weak_positive_signals:
+      - 电商
+      - 带货
+      - 副业
+      - 变现
+      - 开店
+    negative_signals:
+      - 纯电商平台
+      - 物流官网
+      - 支付收款工具
+      - ERP工具
+      - 无课程转化信息
+
+  - id: recitation
+    name: 朗诵课程
+    category: 兴趣类
+    audience_profile:
+      age: 40岁以上，主力45-65岁
+      lifestyle: 有钱有闲的新活力老人
+      interest: 声音课、朗诵课、兴趣类课程
+    strong_positive_signals:
+      - 朗诵课
+      - 声音课
+      - 科学练声
+      - 播音主持
+      - 普通话训练
+      - 配音课
+      - 声音变现
+      - 朗读
+      - 发声训练
+      - 气息训练
+      - 零基础学朗诵
+    weak_positive_signals:
+      - 声音
+      - 表达
+      - 口才
+      - 兴趣班
+      - 愉悦心情
+    negative_signals:
+      - 纯音频平台
+      - 诗歌文章站
+      - 普通话考试官网
+      - 播音院校官网
+      - 无课程报名信息
+
+  - id: chinese_culture
+    name: 国学课程
+    category: 兴趣类
+    audience_profile:
+      age: 40岁以上，主力45-65岁
+      city: 一线、新一线、二线为主，三线有稳定需求
+      education: 大专及以上占比较高
+      occupation: 自由职业、宝妈
+      income: 中高收入，愿意为文化教育付费
+    strong_positive_signals:
+      - 国学课
+      - 国学智慧
+      - 易经课程
+      - 传统文化课
+      - 论语
+      - 道德经
+      - 儒释道
+      - 家庭教育
+      - 文化传承
+      - 国学训练营
+      - 线上国学
+    weak_positive_signals:
+      - 传统文化
+      - 经典诵读
+      - 修身
+      - 文化教育
+      - 亲子教育
+    negative_signals:
+      - 纯文化资讯
+      - 图书销售页
+      - 寺庙/宗教机构官网
+      - 算命风水工具
+      - 无课程转化信息
+
+  - id: health_wellness
+    name: 养生健康课程
+    category: 兴趣类
+    audience_profile:
+      age: 50-75岁，主力55-68岁
+      gender: 女性略多，男性更关注慢病管理
+      city: 三线及以下城市需求强，其次二线
+      family: 空巢老人、与子女同住、退休或半退休
+      income: 中低到中等收入，但愿意为健康花钱
+    strong_positive_signals:
+      - 养生课
+      - 健康课
+      - 慢病管理
+      - 中医养生
+      - 调理
+      - 睡眠改善
+      - 血糖
+      - 血压
+      - 肩颈
+      - 体质调理
+      - 健康训练营
+      - 食疗
+      - 经络
+      - 艾灸
+    weak_positive_signals:
+      - 健康
+      - 保健
+      - 营养
+      - 老年健康
+      - 养生知识
+    negative_signals:
+      - 医院官网
+      - 药品销售
+      - 医疗器械
+      - 纯健康资讯
+      - 问诊平台
+      - 无课程或训练营信息
+    compliance_notes:
+      - 健康养生涉及医疗合规风险，需标记疾病治疗、疗效承诺、药品售卖等风险信号。
+
+  - id: wellness_yoga
+    name: 养生瑜伽课程
+    category: 兴趣类
+    audience_profile:
+      gender: 女性为主
+      age: 50-70岁，占比较高，51-55岁和60岁以上高转
+      city: 一线及新一线城市占比较高
+      work_status: 在职和退休均有
+      seed_channels:
+        - 有书
+        - 洞见
+        - 李月亮
+        - 不二大叔
+        - 健康之路
+    strong_positive_signals:
+      - 瑜伽课
+      - 养生瑜伽
+      - 中老年瑜伽
+      - 女性瑜伽
+      - 零基础瑜伽
+      - 拉伸
+      - 体式
+      - 肩颈瑜伽
+      - 睡眠瑜伽
+      - 冥想
+      - 塑形
+      - 瑜伽训练营
+    weak_positive_signals:
+      - 女性健康
+      - 身体管理
+      - 柔韧
+      - 气质
+      - 放松
+    negative_signals:
+      - 瑜伽馆线下门店但无线上课程
+      - 纯运动装备
+      - 纯健身内容
+      - 纯瑜伽资讯
+      - 无课程报名信息
+
+  - id: taichi
+    name: 太极课程
+    category: 兴趣类
+    audience_profile:
+      gender: 不限
+      age: 45-70岁，占比高，51-60岁重点
+      city: 深圳、北京、广州、佛山等一线及新一线高转
+      seed_channels:
+        - 太极灵儿
+        - 兴趣岛
+    strong_positive_signals:
+      - 太极课
+      - 太极拳
+      - 太极教学
+      - 太极养生
+      - 站桩
+      - 八段锦
+      - 五禽戏
+      - 陈氏太极
+      - 杨氏太极
+      - 零基础学太极
+      - 太极训练营
+      - 线上太极
+    weak_positive_signals:
+      - 传统运动
+      - 养生运动
+      - 健身
+      - 气血
+      - 柔和运动
+    negative_signals:
+      - 纯武馆/协会官网
+      - 纯赛事资讯
+      - 纯短视频账号介绍
+      - 线下场馆但无课程转化
+      - 与瑜伽/普通健身混淆且缺少太极关键词
