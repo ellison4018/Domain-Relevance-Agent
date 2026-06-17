@@ -12,33 +12,38 @@
 
 ## 🧭 架构总览
 
+```mermaid
+flowchart TD
+    START([START]) --> N[normalize_domain]
+    N --> P[http_probe]
+    P --> C{classify_access_status}
+
+    C -->|reachable / login_only<br/>weak_content / unknown| CR[crawl_content]:::tool
+    C -->|cloud_error| PR{path_recovery}
+    C -->|unreachable| QC[content_quality_check]
+
+    PR -->|found_url| CR
+    PR -->|not_found| QC
+
+    CR --> QC
+    QC --> HP[compute_historical_prior]
+    HP --> GF{run_generic_filter}
+
+    GF -->|有抓取正文| EE[extract_evidence]:::llm
+    EE --> JR[judge_relevance]:::llm
+    GF -->|无抓取正文| IQ[icp_query]:::tool
+    IQ --> IJ[icp_judge]:::llm
+
+    JR --> CS[calibrate_score]
+    IJ --> CS
+    CS --> PS[persist]:::tool
+    PS --> END([END])
+
+    classDef llm  fill:#fef3c7,stroke:#d97706,color:#92400e;
+    classDef tool fill:#ecfdf5,stroke:#047857,color:#064e3b;
 ```
-START → normalize_domain → http_probe → classify_access_status
-                                                │
-        ┌───────────────────────────────────────┼───────────────────────┐
-        ▼                                       ▼                       ▼
-   reachable/login/                         cloud_error             unreachable
-   weak_content/unknown                         │                       │
-        │                                       ▼                       │
-        ▼                                  path_recovery                │
-   crawl_content                                  │                       │
-        │                            ┌────────────┴────────┐              │
-        │                            ▼                     ▼            │
-        │                       found_url            not_found ──────────┤
-        │                            │                                  │
-        ▼                            ▼                                  │
-   content_quality_check ←──────────────────────────────────────────────┘
-        │
-        ▼
-   compute_historical_prior
-        │
-        ▼
-   run_generic_filter
-        │
-        ├── 有抓取正文 → extract_evidence → judge_relevance ──┐
-        │                                                      ├──→ calibrate_score → persist → END
-        └── 无抓取正文 → icp_query → icp_judge ────────────────┘
-```
+
+> 配色说明：默认色块为**规则节点**；🟢 绿框是**工具调用**（抓取 / ICP / 持久化）；🟡 黄框是 **LLM 节点**（证据抽取 / 相关性裁判 / ICP 裁判）。菱形是分支判断。
 
 ### 节点职责
 
